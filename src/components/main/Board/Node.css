@@ -1,0 +1,198 @@
+.table {
+  transition: all 1s;
+}
+
+.start {
+  z-index: 4;
+  border-radius: 2px;
+  position: relative;
+  background-image: radial-gradient(farthest-corner, #AAFF00, #AAFF00 25%, green);
+  color: #4caf50;
+  box-shadow: 2px 4px 1px 1px rgb(24, 28, 47, 0.7);
+}
+
+.finish {
+  z-index: 5;
+  border-radius: 2px;
+  position: relative;
+  background-image: radial-gradient(farthest-corner, #ef5350, #ef5350 10%, red);
+  color: #ef5350;
+  box-shadow: 2px 4px 1px 1px rgb(24, 28, 47, 0.8);
+}
+
+.node {
+  z-index: 1;
+  position: relative;
+  background-color: white;
+  color: #b8aaff;
+  box-shadow: 2px 4px 1px 1px rgb(24, 28, 47, 0.7);
+  transition: border 0.2s, background-color 0.3s;
+}
+
+.wall {
+  position: relative;
+  z-index: 5;
+  animation-name: wall-animation;
+  animation-duration: 0.5s;
+  animation-timing-function: ease-out;
+  animation-delay: 0;
+  animation-direction: alternate;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  animation-play-state: running;
+}
+
+.not-found {
+  position: relative;
+  z-index: 1;
+  box-shadow: 2px 2px 1px 1px rgb(24, 28, 47, 0.5);
+  animation-name: not-found-animation;
+  animation-duration: 0.25s;
+  animation-timing-function: ease-out;
+  animation-delay: 0;
+  animation-direction: alternate;
+  animation-fill-mode: forwards;
+  animation-play-state: running;
+  animation-iteration-count: 3;
+}
+
+.visited {
+  position: relative;
+  z-index: 2;
+  border-collapse: collapse;
+  box-shadow: 2px 4px 0px 0px rgb(24, 28, 47, 0.8);
+  animation-name: visited-animation;
+  animation-duration: 2.5s;
+  animation-timing-function: ease-out;
+  animation-delay: 0;
+  animation-direction: alternate;
+  animation-fill-mode: forwards;
+  animation-play-state: running;
+  animation-iteration-count: 2;
+}
+
+.path {
+  z-index: 4;
+  position: relative;
+  color: #b8aaff;
+  box-shadow: 2px 4px 0px 0px rgb(24, 28, 47, 0.8);
+  border-collapse: collapse;
+  animation-duration: 1.5s;
+  animation-name: path-animation;
+  animation-timing-function: ease-out;
+  animation-delay: 0;
+  animation-direction: alternate;
+  animation-fill-mode: forwards;
+  animation-play-state: running;
+  animation-iteration-count: 3;
+}
+
+.chase {
+  z-index: 4;
+  position: relative;
+  box-shadow: 2px 4px 0px 0px rgb(24, 28, 47, 0.8);
+  border-collapse: collapse;
+  animation-name: chase-animation;
+  animation-duration: 2s;
+  animation-timing-function: ease-out;
+  animation-delay: 0;
+  animation-direction: alternate;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  animation-play-state: running;
+}
+
+.midway {
+  z-index: 4;
+  color: #e8e8e8;
+  text-align: center;
+  position: relative;
+  background-color: #e87f29;
+  box-shadow: 2px 4px 0px 0px rgb(24, 28, 47, 0.8);
+}
+
+.maze {
+  animation-name: maze-animation;
+  animation-duration: 2s;
+  animation-timing-function: ease-out;
+  animation-delay: 0;
+  animation-direction: alternate;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  animation-play-state: running;
+}
+
+@keyframes not-found-animation {
+  0% {
+    background-color: #c6ceff;
+  }
+  50% {
+    background-color: #f16562;
+  }
+  100% {
+    background-color: #c6ceff;
+  }
+}
+
+@keyframes wall-animation {
+  0% {
+    background-color: #4a4565;
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes visited-animation {
+  0% {
+    background-color: #c6ceff;
+  }
+  50% {
+    background-color: #ab9aff;
+  }
+  100% {
+    background-color: #c6ceff;
+  }
+}
+
+@keyframes path-animation {
+  0% {
+    background-color: #735ed9;
+  }
+  25% {
+    background-color: #4caf50;
+  }
+  50% {
+    background-color: #ef5350;
+  }
+  100% {
+    background-color: #735ed9;
+  }
+}
+
+@keyframes chase-animation {
+  0% {
+    background-color: #735ed9;
+    box-shadow: 0px 0px;
+    box-shadow: 2px 4px 0px 0px rgb(24, 28, 47, 0.8);
+  }
+  50% {
+    background-color: #c6ceff;
+    box-shadow: 2px 4px 0px 0px rgb(24, 28, 47, 0.8);
+  }
+  100% {
+    background-color: white;
+    outline: 0.5px solid #e0e0e0;
+    box-shadow: 0px 0px;
+  }
+}
+
+@keyframes maze-animation {
+  0% {
+    background-color: #735ed9;
+  }
+  100% {
+    background-color: #ffffff;
+  }
+}

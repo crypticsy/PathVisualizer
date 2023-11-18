@@ -1,0 +1,92 @@
+import { createTheme } from "@mui/material";
+import { grey } from "@mui/material/colors";
+
+const getPalette = (mode) => ({
+  // mode,
+  ...(mode === "light"
+    ? {
+        primary: {
+          main: "#181C2F",
+          light: "#9abfdb",
+          lighter: "#2c3254",
+          dark: "#090a11",
+        },
+        secondary: {
+          main: "#66b5f2",
+          light: "#816edd",
+          lighter: "#bcb4e4",
+          dark: "#2e2659",
+          dark2: "#40367d",
+          darker: "#4f8ed1",
+        },
+        text: {
+          primary: "#66b5f2",
+          secondary: grey[300],
+        },
+        divider: grey[500],
+        background: {
+          default: "#DADCE0",
+          paper: "#181C2F",
+        },
+        custom: {
+          nodeColor: "#FFFFFF",
+        },
+      }
+    : {
+        primary: {
+          main: "#181C2F",
+          light: "#9abfdb",
+          lighter: "#2c3254",
+          dark: "#090a11",
+        },
+        secondary: {
+          main: "#66b5f2",
+          light: "#816edd",
+          lighter: "#bcb4e4",
+          dark: "#2e2659",
+          dark2: "#40367d",
+          darker: "#4f8ed1",
+        },
+        text: {
+          primary: "#66b5f2",
+          secondary: grey[300],
+        },
+        divider: grey[500],
+        background: {
+          default: "#DADCE0",
+          paper: "#181C2F",
+        },
+      }),
+});
+
+export default function getTheme(mode) {
+  const isLightMode = mode === "light";
+
+  return createTheme({
+    palette: getPalette(mode),
+    shadows: [
+      "none",
+      `0px 0px 10px -3px  ${mode === "light" ? grey[500] : "transparent"}`,
+    ],
+    typography: {
+      fontFamily: "Sora",
+      fontWeightLight: 200,
+      fontWeightMedium: 300,
+      fontWeightRegular: 400,
+      fontWeightBold: 500,
+    },
+    custom: {
+      main: {
+        background: isLightMode ? "#F3F5FA" : "#151221",
+      },
+      node: {
+        color: isLightMode ? "#FFFFFF" : "#7770a9",
+        mazeWallColor: !isLightMode ? "#2E2659" : "#2E2659",
+      },
+      topBar: {
+        background: isLightMode ? "#FFFFFF" : "#9abfdb",
+        textColor: !isLightMode ? grey[300] : "#4f8ed1",
+      },
+    },
+  });
+}
