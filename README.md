@@ -1,3 +1,4 @@
-# Path Visaulizer
+# Path Visualizer
 
-Original Project by [Eliya Shalom](https://github.com/Eliya-Shalom/Algo-Vision?ref=reactjsexample.com)
+A python project to visualize search algorithms.
+

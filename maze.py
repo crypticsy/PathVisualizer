@@ -1,135 +1,102 @@
-import numpy as np
-from tabulate import tabulate
+import random
+from typing import NamedTuple
 
 
-class Tile:
-    def __init__(self, y, x):
-        # Initialize a tile with coordinates (y, x)
-        self.x = x
-        self.y = y
-        
-        # By default, the tile is not an obstacle, start or goal
-        self.obstacle = False
-        self.is_start = False
-        self.is_goal = False
-        self.is_visited = False
-    
-    def get_coordinates(self):
-        # Return the coordinates of the tile
-        return (self.x, self.y)
+class Coordinate(NamedTuple):
+    """Maze locations in the grid as x, y coordinates"""
+    x: int
+    y: int
 
-    def set_obstacle(self):
-        # Set the tile as an obstacle
-        self.obstacle = True
-    
-    def set_visited(self):
-        # Set the tile as visited
-        self.is_visited = True
 
-    def set_start(self):
-        # Set the tile as the start tile
-        self.is_start = True
+class MazeSymbol:
+    """Symbols to use when printing the maze"""
+    start_node = "S"
+    end_node = "F"
+    wall = "X"
+    empty = " "
+    path = "*"
 
-    def set_goal(self):
-        # Set the tile as the goal tile
-        self.is_goal = True
 
-    def is_obstacle(self):
-        # Check if the tile is an obstacle
-        return self.obstacle
-
-    def __str__(self):
-        # Print the coordinates of the tile
-        if self.is_start: return "S"
-        elif self.is_goal: return "G"
-        elif self.is_obstacle(): return "#"
-        elif self.is_visited: return "O"
-        return "."
-    
-    def __repr__(self):
-        # String representation of the tile for debugging
-        return f"Tile({self.x}, {self.y}, obstacle={self.obstacle}, start={self.is_start}, goal={self.is_goal})"
-    
-    def __lt__(self, other):
-        # Compare tiles based on their coordinates
-        if self.x == other.x:
-            return self.y < other.y
-        return self.x < other.x
-
-    def __gt__(self, other):
-        # Compare tiles based on their coordinates
-        if self.x == other.x:
-            return self.y > other.y
-        return self.x > other.x
-
-    def __hash__(self):
-        # Hash the tile based on its coordinates
-        return hash((self.x, self.y))
-
+default_obstacles = set([
+    (0, 1),
+    (2, 1),
+    (2, 3),
+    (3, 1),
+    (3, 4),
+    (4, 4)
+])
 
 
 class Maze:
-    def __init__(self, width, height):
-        # Initialize the maze with the given width and height
-        self.width = width
-        self.height = height
-        # Create a grid of tiles using NumPy array
-        self.grid = np.array([[Tile(y, x) for y in range(height)] for x in range(width)])
+    def __init__(
+        self, 
+        rows=5, 
+        columns=6, 
+        barriers=0.2, 
+        start_node=Coordinate(0, 0), 
+        end_node=Coordinate(4, 5),
+        random_obstacles=False):
         
-        # Initialize start and goal positions (set to None initially)
-        self.start_pos = None
-        self.goal_pos = None
-    
+            self.rows = rows
+            self.columns = columns
+            self.barriers = barriers
+            self.start_node = start_node
+            self.end_node = end_node
+            self.maze = [[MazeSymbol.empty for col in range(columns)] for row in range(rows)]
+            self._fill_maze(random_obstacles)
+
+    def _fill_maze(self, random_obstacles):
+        for row in range(self.rows):
+            for col in range(self.columns):
+                if random_obstacles and random.uniform(0, 1) <= self.barriers:
+                    self.maze[row][col] = MazeSymbol.wall
+                elif not random_obstacles and (row, col) in default_obstacles:
+                    self.maze[row][col] = MazeSymbol.wall
+                    
+        self.maze[self.start_node.x][self.start_node.y] = MazeSymbol.start_node
+        self.maze[self.end_node.x][self.end_node.y] = MazeSymbol.end_node
+
+    def get_neighbors(self, curr):
+        """curr is a Location for current location"""
+        next_moves = []
+        # Move one position up
+        if curr.x - 1 >= 0 and self.maze[curr.x - 1][curr.y] != MazeSymbol.wall:
+            next_moves.append(Coordinate(curr.x - 1, curr.y))
+        # Move one position left
+        if curr.y - 1 >= 0 and self.maze[curr.x][curr.y - 1] != MazeSymbol.wall:
+            next_moves.append(Coordinate(curr.x, curr.y - 1))
+        # Move one position right
+        if curr.y + 1 < self.columns and self.maze[curr.x][curr.y + 1] != MazeSymbol.wall:
+            next_moves.append(Coordinate(curr.x, curr.y + 1))
+        # Move one position down
+        if curr.x + 1 < self.rows and self.maze[curr.x + 1][curr.y] != MazeSymbol.wall:
+            next_moves.append(Coordinate(curr.x + 1, curr.y))
+        return next_moves
+
+    def end_node_line(self, curr):
+        if curr.x == self.end_node.x and curr.y == self.end_node.y:
+            return True
+        return False
+
+    def draw_path(self, path):
+        for loc in path:
+            self.maze[loc.x][loc.y] = MazeSymbol.path
+
+    def clear_path(self, path):
+        for loc in path:
+            self.maze[loc.x][loc.y] = MazeSymbol.empty
+
     def __str__(self):
-        # Print the maze
-        return tabulate(self.grid, tablefmt="fancy_grid", stralign="center")
-
-    def set_obstacle(self, y, x):
-        # Set the tile at coordinates (y, x) as an obstacle
-        self.grid[y, x].set_obstacle()
-    
-    def set_visited(self, y, x):
-        # Set the tile at coordinates (y, x) as visited
-        self.grid[y, x].set_visited()
-    
-    def clear_visited(self):
-        # Clear all visited tiles
-        for row in self.grid:
-            for tile in row:
-                tile.is_visited = False
-
-    def is_obstacle(self, y, x):
-        # Check if the tile at coordinates (y, x) is an obstacle
-        return self.grid[y, x].is_obstacle()
-
-    def set_start(self, y, x):
-        # Set the start position
-        self.start_pos = (y, x)
-        self.grid[y, x].set_start()
-
-    def set_goal(self, y, x):
-        # Set the goal position
-        self.goal_pos = (y, x)
-        self.grid[y, x].set_goal()
-
-    def get_neighbors(self, y, x):
-        # Get neighboring coordinates that can be reached from (y, x)
-        neighbors = []
-
-        # Check if there is a tile to the left and it is not an obstacle
-        if y > 0 and not self.is_obstacle(y - 1, x):
-            neighbors.append((y - 1, x))
-
-        # Check if there is a tile to the right and it is not an obstacle
-        if y < self.width - 1 and not self.is_obstacle(y + 1, x):
-            neighbors.append((y + 1, x))
-
-        # Check if there is a tile above and it is not an obstacle
-        if x > 0 and not self.is_obstacle(y, x - 1):
-            neighbors.append((y, x - 1))
-
-        # Check if there is a tile below and it is not an obstacle
-        if x < self.height - 1 and not self.is_obstacle(y, x + 1):
-            neighbors.append((y, x + 1))
-
-        return neighbors
+        """Prints the current maze state if used outside of browser, mainly for debugging"""
+        pretty_printed = ''
+        for num, row in enumerate(self.maze):
+            if num == 0:
+                pretty_printed += "".join("_" for i in range(self.columns + 2)) + "\n"
+            pretty_printed += "|"
+            for space in row:
+                pretty_printed += space
+            if num == (self.columns - 1):
+                pretty_printed += "|\n" + "".join("-" for i in range(self.columns + 2)) + "\n"
+                break
+            pretty_printed += "|\n"
+        return pretty_printed
