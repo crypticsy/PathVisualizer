@@ -40,7 +40,7 @@ window.jsboard = (function(){
                 }
             },
             // inner cell functions
-            cell: function(arr,move) {
+            cell: function(arr, move) {
                 // get DOM node for given row and col
                 function getBoardCell(row,col) {
                     return document.getElementById(attached).getElementsByClassName("boardRow_"+row)[0].childNodes[col];
@@ -123,7 +123,7 @@ window.jsboard = (function(){
                                     while (th.firstChild) { th.removeChild(th.firstChild); }
                                     var ra = Math.floor((Math.random() * 3000) + 1);
                                     var n = piece.cloneNode(true);
-                                    n.className = "pieceID_"+ra;
+                                    n.className = "piece pieceID_" + ra;
                                     th.appendChild(n);
                                 }
                             }
@@ -242,10 +242,17 @@ window.jsboard = (function(){
         var node = node;
 
         var methods = {
-            clone: function() {
+            clone: function(type="default") {
                 var nn = node.cloneNode(true);
                 var ra = Math.floor((Math.random() * 3000) + 1);
-                nn.className = nn.className + " w-16 h-16 rounded-md pieceID_"+ra;
+                if(type=="default"){
+                    nn.className = nn.className + " w-16 h-16 rounded-md pieceID_" + ra;
+                    if(nn.className.includes("path")){
+                        nn.className = nn.className + " popUpPath";
+                    }
+                }else{
+                    nn.className = "w-16 h-16 rounded-md final-path popUpWall pieceID_" + ra;
+                }
                 return nn;
             },
             style: function(props) {
@@ -286,14 +293,6 @@ window.jsboard = (function(){
                             attachedBoard.appendChild(a);
                         }
 
-                        // // style default game board
-                        // attachedBoard.style.borderSpacing  = "2px";
-                        // for (var i=0; i<attachedBoard.getElementsByTagName("td").length; i++) {
-                        //     attachedBoard.getElementsByTagName("td")[i].style.background = "lightgray";
-                        //     attachedBoard.getElementsByTagName("td")[i].style.width = "50px";
-                        //     attachedBoard.getElementsByTagName("td")[i].style.height = "50px";
-                        // }
-
                         // create checkerboard pattern
                         if (props.style && props.style=="checkerboard") {
                             var colour = "gray";
@@ -303,6 +302,7 @@ window.jsboard = (function(){
                                 }
                                 colour = props.stylePattern[1];
                             }
+
                             for (var r=0; r<size[0]; r++) {
                                 if (r%2) var skipCol = true;
                                 else var skipCol = false;
@@ -323,12 +323,7 @@ window.jsboard = (function(){
         piece: function(props) {
             // create new DOM node to serve as piece
             var a = document.createElement("div");
-            if (props.text) {
-                // add class based on props value
-                a.className = props.text;
-            }
-
-            
+            a.className = props.text;
             return Piece(a);
         }
 

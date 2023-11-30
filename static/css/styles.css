@@ -70,6 +70,14 @@ h2 {
   line-height: 0.8;
 }
 
+hr {
+  background-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 1),
+    rgba(0, 0, 0, 0)
+  );
+}
+
 button {
   cursor: pointer;
   background-color: rgb(12 74 110);
@@ -116,6 +124,50 @@ button:hover {
   }
 }
 
+@keyframes PopUpAnimation {
+  0% {
+    transform: scale(0) translateY(-10px);
+  }
+  20% {
+    opacity: 0.5;
+    transform: scale(0.5) translateY(-10px);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1) translateY(-10px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.9) translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(-10px);
+  }
+}
+
+@keyframes PopUpAnimationEmpty {
+  0% {
+    transform: scale(0);
+  }
+  20% {
+    opacity: 0.5;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .wall {
   box-shadow: 0 0 #d9d9d9, 0 0px #d9d9d9, 0 1px #d9d9d9, 0 2px #d9d9d9,
     0 3px #d9d9d9, 0 4px #d9d9d9, 0 5px #d9d9d9, 0 6px #d9d9d9, 0 7px #d9d9d9,
@@ -124,17 +176,44 @@ button:hover {
   background-color: #fff;
   border-color: #e6e6e6;
   backface-visibility: hidden;
+  border-radius: 0.2rem;
+  display: inline-block;
+  transform: translateY(-10px);
+}
+
+.final-path {
+  box-shadow: 0 0 rgb(11, 94, 26), 0 0px rgb(11, 94, 26), 0 1px rgb(11, 94, 26),
+    0 2px rgb(11, 94, 26), 0 3px rgb(11, 94, 26), 0 4px rgb(11, 94, 26),
+    0 5px rgb(11, 94, 26), 0 6px rgb(11, 94, 26), 0 7px rgb(11, 94, 26),
+    0 8px rgb(11, 94, 26), 0 9px rgb(11, 94, 26), 0 10px rgb(11, 94, 26),
+    0 11px rgb(11, 94, 26), 0 12px rgb(11, 94, 26), 0px 5px 2px rgb(11, 94, 26),
+    0px 14px 2px rgb(11, 94, 26);
+  background-color: rgb(0, 143, 26);
+  border-color: rgb(0, 143, 26);
+  backface-visibility: hidden;
   border-radius: 0.25rem;
   display: inline-block;
-  transform: translate3d(0, -10px, 25px);
-  transform-style: preserve-3d;
-  transition: all 0.25s cubic-bezier(0.2, 1, 0.2, 1);
+  transform: translateY(-10px);
 }
 
 .empty {
   background-color: rgba(0, 0, 0, 0.05);
   border-radius: 0.25rem;
-  box-shadow: inset 0 0px 1px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0px rgba(0, 0, 0, 0.2);
-  transform-style: preserve-3d;
+  box-shadow: inset 0 0px 0px rgba(0, 0, 0, 0.2),
+    inset 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.popUpPath{
+  animation: PopUpAnimationEmpty ease 0.45s;
+  transition: all .25s cubic-bezier(0.2, 1, 0.2, 1);
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+
+.popUpWall{
+  transform: translateY(-10px);
+  animation: PopUpAnimation ease 0.45s;
+  transition: all .25s cubic-bezier(0.2, 1, 0.2, 1);
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
 }
