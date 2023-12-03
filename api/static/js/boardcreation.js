@@ -13,7 +13,7 @@ const empty = jsboard.piece({ text: "empty " });
 const rowLookup = {
   X: wall,
   S: start,
-  F: finish,
+  E: finish,
   '*': path
 };
 

@@ -91,32 +91,43 @@ def euclidean_distance(finish_line):
 
 
 def reconstruct_path(locations):
-    # Reconstruct the path from the search algorithm results
+    # Initialize an empty list to store the reconstructed path
     path = []
+
+    # Iterate through the locations, moving backward in the path
     while locations.previous is not None:
         locations = locations.previous
         path.append(locations.current)
-        
-    return path[::-1]  # Reverse the path to start from the beginning
+
+    # Reverse the path to start from the beginning
+    return path[::-1]
 
 
-
-def depth_first_search(start_node, end_node, neighbors):
+# Depth-First Search Algorithm
+def depth_first_search(maze):
+    # Initialize a stack for DFS
     stack = Stack()
-    stack.push(Move(start_node, None))
-    visited_node = {start_node}
+    stack.push(Move(maze.start_node, None))
+    
+    # Track visited nodes to avoid loops
+    visited_node = {maze.start_node}
+    
+    # List to store all explored paths
     all_paths = []
     
+    # Main DFS loop
     while not stack.stuck:
         loc = stack.pop()
         active = loc.current
         all_paths.append(active)
         
-        if end_node(active):
+        # Check if the end node is reached
+        if maze.end_node_line(active):
             final_path = reconstruct_path(loc)
             return final_path[1:], all_paths[1:-1]
         
-        for neighbor in neighbors(active):
+        # Explore neighbors
+        for neighbor in maze.get_neighbors(active):
             if neighbor not in visited_node:
                 visited_node.add(neighbor)
                 stack.push(Move(neighbor, loc))
@@ -125,23 +136,31 @@ def depth_first_search(start_node, end_node, neighbors):
     return None, None
 
 
-
-def breadth_first_search(start_node, end_node, neighbors):
+# Breadth-First Search Algorithm
+def breadth_first_search(maze):
+    # Initialize a queue for BFS
     queue = Queue()
-    queue.push(Move(start_node, None))
-    visited_node = {start_node}
+    queue.push(Move(maze.start_node, None))
+    
+    # Track visited nodes to avoid revisiting
+    visited_node = {maze.start_node}
+    
+    # List to store all explored paths
     all_paths = []
-
+    
+    # Main BFS loop
     while not queue.stuck:
         loc = queue.pop()
         active = loc.current
         all_paths.append(active)
         
-        if end_node(active):
+        # Check if the end node is reached
+        if maze.end_node_line(active):
             final_path = reconstruct_path(loc)
             return final_path[1:], all_paths[1:-1]
         
-        for neighbor in neighbors(active):
+        # Explore neighbors
+        for neighbor in maze.get_neighbors(active):
             if neighbor not in visited_node:
                 visited_node.add(neighbor)
                 queue.push(Move(neighbor, loc))
@@ -150,29 +169,40 @@ def breadth_first_search(start_node, end_node, neighbors):
     return None, None
 
 
-
-def a_star(start_node, end_node, neighbors, heuristic):
+# A* Search Algorithm
+def a_star(maze, heuristic_func, return_weights=False):
+    # Initialize a priority queue for A*
     frontier = PriorityQueue()
-    frontier.push(Move(start_node, None, 0.0, heuristic(start_node)))
+    heuristic = heuristic_func(maze.end_node)
+    frontier.push(Move(maze.start_node, None, 0.0, heuristic(maze.start_node)))
     
-    visited_node = {start_node: 0.0}
+    # Track visited nodes and their costs
+    visited_node = {maze.start_node: 0.0}
+    
+    # List to store all explored paths
     all_paths = []
     
+    # Main A* loop
     while not frontier.empty:
         loc = frontier.pop()
         active = loc.current
         all_paths.append(active)
         
-        if end_node(active):
+        # Check if the end node is reached
+        if maze.end_node_line(active):
             final_path = reconstruct_path(loc)
+            if return_weights: return final_path[1:], all_paths[1:-1], visited_node
             return final_path[1:], all_paths[1:-1]
         
-        for neighbor in neighbors(active):
+        # Explore neighbors
+        for neighbor in maze.get_neighbors(active):
             new_cost = loc.cost + 1
             
+            # Update cost if a shorter path is found
             if neighbor not in visited_node or visited_node[neighbor] > new_cost:
                 visited_node[neighbor] = new_cost
                 frontier.push(Move(neighbor, loc, new_cost, heuristic(neighbor)))
 
     # Return None if no maze solution is found
+    if return_weights: return None, None, visited_node
     return None, None
