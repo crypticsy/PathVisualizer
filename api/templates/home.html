@@ -74,14 +74,7 @@
               value="wall">
                 Randomize Walls
               </button>
-              <button
-                type="submit"
-                class="rounded-lg py-2"
-                name="rand"
-                value="loc"
-              >
-                Randomize Finish Location
-              </button>
+
             </form>
           </div>
         </div>
@@ -92,10 +85,11 @@
         <script src="{{ url_for('static', filename='js/jsboard.js') }}"></script>
         <script>
           var maze_map = {{ maze_map|tojson }}; 
-          var dfs_path = {{ dfs_path|tojson }};                
+
+          var dfs_path = {{ dfs_path|tojson }};
           var bfs_path = {{ bfs_path|tojson }}; 
           var astar_path = {{ astar_path|tojson }};
-          var bidirectional_path = {{ bidirectional_path|tojson }};
+          var bidir_path = {{ bidir_path|tojson }};
 
           var final_dfs = {{ final_dfs|tojson }}; 
           var final_bfs = {{ final_bfs|tojson }};

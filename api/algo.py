@@ -222,6 +222,20 @@ def combine_weights(weights1, weights2):
     # Return the combined weights
     return combined_weights
 
+# Define a function to get unique paths from a list of paths
+def get_unique_paths(all_paths):
+    # Initialize a list to store unique paths
+    unique_paths = []
+    
+    # Iterate through all paths
+    for path in all_paths:
+        # Check if the path was already added
+        if path not in unique_paths:
+            unique_paths.append(path)
+
+    # Return the unique paths
+    return unique_paths
+
 
 # Define the bidirectional A* search algorithm
 def bidirectional_a_star(maze, heuristic_func, return_weights=False):
@@ -258,20 +272,22 @@ def bidirectional_a_star(maze, heuristic_func, return_weights=False):
         if active in visited_node2 or active2 in visited_node:
             # Determine the meeting point and combine paths
             if active in visited_node2:
-                while frontier2.empty == False:
-                    loc2 = frontier2.pop()
+                mid_point = active
+                while loc2:
                     if loc2.current in visited_node: break
+                    loc2 = frontier2.pop()
             else:
-                while frontier.empty == False:
-                    loc = frontier.pop()
+                mid_point = active2
+                while loc:
                     if loc.current in visited_node2: break
-            
+                    loc = frontier.pop()
+
             # Combine paths and reverse the path from the end to meeting point
-            actual_final_path = reconstruct_path(loc)[1:] + reconstruct_path(loc2)[1:][::-1]
+            actual_final_path = get_unique_paths(reconstruct_path(loc)[1:] + [mid_point] + reconstruct_path(loc2)[1:][::-1])
             
             # Return the final path and additional information if requested
-            if return_weights: return actual_final_path, all_paths[2:-2], combine_weights(visited_node, visited_node2)
-            return actual_final_path, all_paths[2:-2]
+            if return_weights: return actual_final_path, get_unique_paths(all_paths[2:]), combine_weights(visited_node, visited_node2)
+            return actual_final_path, get_unique_paths(all_paths[2:])
         
         # Explore neighbors for A* from the start node
         for neighbor in maze.get_neighbors(active):

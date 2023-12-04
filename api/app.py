@@ -19,6 +19,8 @@ def home():
             rand_x = np.random.choice(np.arange(5))
             rand_y = np.random.choice(np.arange(6)) if rand_x != 0 else np.random.choice(np.arange(1, 6))
             
+            print(rand_x, rand_y)
+            
             # Create a new maze with the specified end node
             m = Maze(end_node=Coordinate(x=rand_x, y=rand_y))
         
@@ -45,6 +47,8 @@ def home():
     # Perform bidirectional A* search algorithm on the maze
     final_bidir, path_bidir = bidirectional_a_star(m, manhattan_distance)
     
+    print(final_bidir, path_bidir)
+    
     # Render the template with maze information and algorithm results
     return render_template(
         'home.html', 
@@ -52,7 +56,7 @@ def home():
         dfs_path=path_dfs, 
         bfs_path=path_bfs,
         astar_path=path_astar, 
-        bidirectional_path=path_bidir,
+        bidir_path=path_bidir,
         final_bfs=final_bfs, 
         final_dfs=final_dfs,
         final_astar=final_astar, 
