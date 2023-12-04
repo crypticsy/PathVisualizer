@@ -206,3 +206,91 @@ def a_star(maze, heuristic_func, return_weights=False):
     # Return None if no maze solution is found
     if return_weights: return None, None, visited_node
     return None, None
+
+
+# Define a function to combine two dictionaries of weights
+def combine_weights(weights1, weights2):
+    # Create a copy of the first dictionary to avoid modifying the original
+    combined_weights = {**weights1}
+    
+    # Iterate through the second dictionary
+    for key, value in weights2.items():
+        # Update the combined weights if the key is not present or if the new value is smaller
+        if key not in combined_weights or combined_weights[key] > value:
+            combined_weights[key] = value
+    
+    # Return the combined weights
+    return combined_weights
+
+
+# Define the bidirectional A* search algorithm
+def bidirectional_a_star(maze, heuristic_func, return_weights=False):
+    # Initialize a priority queue for A* from the start node
+    frontier = PriorityQueue()
+    heuristic1 = heuristic_func(maze.end_node)
+    frontier.push(Move(maze.start_node, None, 0.0, heuristic1(maze.start_node)))
+    
+    # Initialize a priority queue for A* from the end node
+    frontier2 = PriorityQueue()
+    heuristic2 = heuristic_func(maze.start_node)
+    frontier2.push(Move(maze.end_node, None, 0.0, heuristic2(maze.end_node)))
+    
+    # Track visited nodes and their costs for each direction
+    visited_node = {maze.start_node: 0.0}
+    visited_node2 = {maze.end_node: 0.0}
+    
+    # List to store all explored paths
+    all_paths = []
+    
+    # Main bidirectional A* loop
+    while not frontier.empty and not frontier2.empty:
+        # Process A* from the start node
+        loc = frontier.pop()
+        active = loc.current
+        all_paths.append(active)
+        
+        # Process A* from the end node
+        loc2 = frontier2.pop()
+        active2 = loc2.current
+        all_paths.append(active2)
+        
+        # Check if the two paths meet
+        if active in visited_node2 or active2 in visited_node:
+            # Determine the meeting point and combine paths
+            if active in visited_node2:
+                while frontier2.empty == False:
+                    loc2 = frontier2.pop()
+                    if loc2.current in visited_node: break
+            else:
+                while frontier.empty == False:
+                    loc = frontier.pop()
+                    if loc.current in visited_node2: break
+            
+            # Combine paths and reverse the path from the end to meeting point
+            actual_final_path = reconstruct_path(loc)[1:] + reconstruct_path(loc2)[1:][::-1]
+            
+            # Return the final path and additional information if requested
+            if return_weights: return actual_final_path, all_paths[2:-2], combine_weights(visited_node, visited_node2)
+            return actual_final_path, all_paths[2:-2]
+        
+        # Explore neighbors for A* from the start node
+        for neighbor in maze.get_neighbors(active):
+            new_cost = loc.cost + 1
+            
+            # Update cost if a shorter path is found
+            if neighbor not in visited_node or visited_node[neighbor] > new_cost:
+                visited_node[neighbor] = new_cost
+                frontier.push(Move(neighbor, loc, new_cost, heuristic1(neighbor)))
+        
+        # Explore neighbors for A* from the end node
+        for neighbor in maze.get_neighbors(active2):
+            new_cost = loc2.cost + 1
+            
+            # Update cost if a shorter path is found
+            if neighbor not in visited_node2 or visited_node2[neighbor] > new_cost:
+                visited_node2[neighbor] = new_cost
+                frontier2.push(Move(neighbor, loc2, new_cost, heuristic2(neighbor)))
+    
+    # Return None if no maze solution is found
+    if return_weights: return None, None, combine_weights(visited_node, visited_node2)
+    return None, None

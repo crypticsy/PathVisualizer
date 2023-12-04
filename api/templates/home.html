@@ -47,7 +47,7 @@
 
           <div class="gap-y-3 flex flex-col">
             <h3>See how each algorithm searches:</h3>
-            <div class="grid grid-cols-3 font-bold gap-x-4">
+            <div class="grid grid-cols-2 font-bold gap-4">
               <button type="button" class="rounded-lg py-2" id="drawPathDFS">
                 Depth-First Search
               </button>
@@ -57,6 +57,9 @@
               <button type="button" class="rounded-lg py-2" id="drawPathAstar">
                 A* Search
               </button>
+              <button type="button" class="rounded-lg py-2" id="drawPathBiDirectionalAstar">
+                BiDirectional Search
+              </button>
             </div>
           </div>
 
@@ -65,7 +68,7 @@
             <form
               action="{{ url_for('home') }}"
               method="post"
-              class="grid grid-cols-3 font-bold gap-x-4"
+              class="grid grid-cols-2 font-bold gap-4"
             >
               <button type="submit" class="rounded-lg py-2" name="rand" 
               value="wall">
@@ -92,9 +95,12 @@
           var dfs_path = {{ dfs_path|tojson }};                
           var bfs_path = {{ bfs_path|tojson }}; 
           var astar_path = {{ astar_path|tojson }};
+          var bidirectional_path = {{ bidirectional_path|tojson }};
+
           var final_dfs = {{ final_dfs|tojson }}; 
           var final_bfs = {{ final_bfs|tojson }};
           var final_astar = {{ final_astar|tojson }};
+          var final_bidir = {{ final_bidir|tojson }};
         </script>
         <script src="{{ url_for('static', filename='js/boardcreation.js') }}"></script>
       </div>
