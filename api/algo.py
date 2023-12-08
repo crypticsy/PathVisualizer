@@ -237,8 +237,8 @@ def get_unique_paths(all_paths):
     return unique_paths
 
 
-# Define the bidirectional A* search algorithm
-def bidirectional_a_star(maze, heuristic_func, return_weights=False):
+# Define the bidirectional heuristic search algorithm
+def bidirectional_heuristic_search(maze, heuristic_func, return_weights=False):
     # Initialize a priority queue for A* from the start node
     frontier = PriorityQueue()
     heuristic1 = heuristic_func(maze.end_node)

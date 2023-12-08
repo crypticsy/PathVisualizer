@@ -60,4 +60,4 @@ function draw(vistedPath, finalPath ){
 document.getElementById("drawPathDFS").addEventListener("click", () => draw(dfs_path, final_dfs));
 document.getElementById("drawPathBFS").addEventListener("click", () => draw(bfs_path, final_bfs));
 document.getElementById("drawPathAstar").addEventListener("click", () => draw(astar_path, final_astar));
-document.getElementById("drawPathBiDirectionalAstar").addEventListener("click", () => draw(bidir_path, final_bidir));
+document.getElementById("drawPathBiDirectionalHeuristicSearch").addEventListener("click", () => draw(bidir_path, final_bidir));

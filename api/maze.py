@@ -29,6 +29,7 @@ default_obstacles = set([
 ])
 
 class Maze:
+    
     def __init__(
         self, 
         rows=5, 
@@ -39,25 +40,41 @@ class Maze:
         random_obstacles=False, 
         custom_obstacles=default_obstacles):
         
+            # Maze Dimensions
             self.rows = rows
             self.columns = columns
+            
+            # Density of Barriers (Obstacles)
             self.barriers = barriers
+            
+            # Start and End Nodes
             self.start_node = start_node
             self.end_node = end_node
+            
+            # Obstacle Configuration
             self.custom_obstacles = custom_obstacles
             self.random_obstacles = random_obstacles
-            
+                
+            # Maze Initialization
             self.maze = [[MazeSymbol.empty for col in range(columns)] for row in range(rows)]
+            
+            # Fill Maze with Obstacles
             self._fill_maze(self.random_obstacles)
 
     def _fill_maze(self, random_obstacles):
+        """ Fills the maze with obstacles based on the specified configuration."""
+
+        # Loop through each cell in the maze
         for row in range(self.rows):
             for col in range(self.columns):
+                # If random obstacles are enabled and a random value is within the barrier density
                 if random_obstacles and random.uniform(0, 1) <= self.barriers:
                     self.maze[row][col] = MazeSymbol.wall
+                # If custom obstacles are specified and the current cell is in the custom obstacles list
                 elif not random_obstacles and (row, col) in self.custom_obstacles:
                     self.maze[row][col] = MazeSymbol.wall
-                    
+
+        # Set the start and end nodes in the maze
         self.maze[self.start_node.x][self.start_node.y] = MazeSymbol.start_node
         self.maze[self.end_node.x][self.end_node.y] = MazeSymbol.end_node
 

@@ -1,7 +1,7 @@
 import numpy as np
 from api.maze import Maze, Coordinate
 from flask import render_template, Flask, request
-from api.algo import depth_first_search, breadth_first_search, a_star, manhattan_distance, bidirectional_a_star
+from api.algo import depth_first_search, breadth_first_search, a_star, manhattan_distance, bidirectional_heuristic_search
 
 # initialize the Flask app
 app = Flask(__name__)
@@ -45,7 +45,7 @@ def home():
     final_astar, path_astar = a_star(m, manhattan_distance)
     
     # Perform bidirectional A* search algorithm on the maze
-    final_bidir, path_bidir = bidirectional_a_star(m, manhattan_distance)
+    final_bidir, path_bidir = bidirectional_heuristic_search(m, manhattan_distance)
     
     print(final_bidir, path_bidir)
     
