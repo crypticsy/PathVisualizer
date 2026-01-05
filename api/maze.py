@@ -19,37 +19,30 @@ class MazeSymbol:
     path = "*"
 
 
-default_obstacles = set([
-    (0, 1),
-    (2, 1),
-    (2, 3),
-    (3, 1),
-    (3, 4),
-    (4, 4)
-])
+default_obstacles = set()
 
 class Maze:
-    
+
     def __init__(
-        self, 
-        rows=5, 
-        columns=6, 
-        barriers=0.2, 
-        start_node=Coordinate(0, 0), 
-        end_node=Coordinate(4, 5),
-        random_obstacles=False, 
+        self,
+        rows=30,
+        columns=30,
+        barriers=0.2,
+        start_node=None,
+        end_node=None,
+        random_obstacles=False,
         custom_obstacles=default_obstacles):
-        
+
             # Maze Dimensions
             self.rows = rows
             self.columns = columns
-            
+
             # Density of Barriers (Obstacles)
             self.barriers = barriers
-            
-            # Start and End Nodes
-            self.start_node = start_node
-            self.end_node = end_node
+
+            # Start and End Nodes (dynamic based on grid size)
+            self.start_node = start_node if start_node is not None else Coordinate(0, 0)
+            self.end_node = end_node if end_node is not None else Coordinate(rows - 1, columns - 1)
             
             # Obstacle Configuration
             self.custom_obstacles = custom_obstacles
@@ -130,7 +123,7 @@ class Maze:
     
     def display_maze(self, return_html=False):
         """Draws the maze in the browser"""
-        
+
         html_content = ""
         cell_type = {
             'S' : 'bg-green-700',
@@ -142,7 +135,7 @@ class Maze:
         for row in self.maze:
             html_content += "<div class='flex flex-row'>"
             for node in row:
-                current_class = "bg-slate-500/50" if node not in cell_type else cell_type[node] 
+                current_class = "bg-slate-500/50" if node not in cell_type else cell_type[node]
                 html_content += f"<div class='flex flex-col w-12 h-12 text-center justify-center font-bold border-2 border-gray-200/20 {current_class} '>{node}</div>"
             html_content += "</div>"
 
@@ -155,6 +148,38 @@ class Maze:
 
         if return_html: return html_content
         return HTML(html_content)
+
+    @classmethod
+    def from_grid_state(cls, grid_state, start, end):
+        """
+        Create a Maze from a client-provided grid state.
+
+        Args:
+            grid_state: 2D list where True = wall, False = empty
+            start: [row, col] of start position
+            end: [row, col] of end position
+
+        Returns:
+            Maze instance
+        """
+        rows = len(grid_state)
+        cols = len(grid_state[0]) if rows > 0 else 0
+
+        # Find all wall positions
+        obstacles = set()
+        for r in range(rows):
+            for c in range(cols):
+                if grid_state[r][c]:
+                    obstacles.add((r, c))
+
+        return cls(
+            rows=rows,
+            columns=cols,
+            start_node=Coordinate(start[0], start[1]),
+            end_node=Coordinate(end[0], end[1]),
+            random_obstacles=False,
+            custom_obstacles=obstacles
+        )
 
 
 def draw_mazes(mazes, title, final_path_lenth, runtime, final_maze):

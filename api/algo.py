@@ -1,6 +1,7 @@
 from math import sqrt
 from collections import deque
 from heapq import heappush, heappop
+from api.maze import Coordinate, MazeSymbol
 
 class Stack:
     def __init__(self):
@@ -309,4 +310,177 @@ def bidirectional_heuristic_search(maze, heuristic_func, return_weights=False):
     
     # Return None if no maze solution is found
     if return_weights: return None, None, combine_weights(visited_node, visited_node2)
+    return None, None
+
+
+# Dijkstra's Algorithm (A* with zero heuristic)
+def dijkstra(maze, return_weights=False):
+    """
+    Dijkstra's algorithm finds the shortest path using uniform cost search.
+    It's essentially A* with a heuristic function that always returns 0.
+    """
+    # Use A* with zero heuristic
+    zero_heuristic = lambda end: lambda loc: 0
+    return a_star(maze, zero_heuristic, return_weights)
+
+
+# Greedy Best-First Search
+def greedy_best_first(maze, heuristic_func, return_weights=False):
+    """
+    Greedy Best-First Search uses only the heuristic to guide the search.
+    It doesn't consider the actual path cost, making it faster but not optimal.
+    """
+    # Initialize a priority queue
+    frontier = PriorityQueue()
+    heuristic = heuristic_func(maze.end_node)
+
+    # Create initial move with zero cost (we only use heuristic)
+    frontier.push(Move(maze.start_node, None, 0.0, heuristic(maze.start_node)))
+
+    # Track visited nodes
+    visited_node = {maze.start_node: 0.0}
+
+    # List to store all explored paths
+    all_paths = []
+
+    # Main Greedy Best-First loop
+    while not frontier.empty:
+        loc = frontier.pop()
+        active = loc.current
+        all_paths.append(active)
+
+        # Check if the end node is reached
+        if maze.end_node_line(active):
+            final_path = reconstruct_path(loc)
+            if return_weights: return final_path[1:], all_paths[1:-1], visited_node
+            return final_path[1:], all_paths[1:-1]
+
+        # Explore neighbors
+        for neighbor in maze.get_neighbors(active):
+            # Only use heuristic for priority, ignore actual cost
+            if neighbor not in visited_node:
+                visited_node[neighbor] = 0.0  # We don't track actual cost in greedy
+                # Push with zero cost, only heuristic matters
+                frontier.push(Move(neighbor, loc, 0.0, heuristic(neighbor)))
+
+    # Return None if no maze solution is found
+    if return_weights: return None, None, visited_node
+    return None, None
+
+
+# Jump Point Search (JPS) - Optimized A* for uniform-cost grids
+def jump_point_search(maze, heuristic_func, return_weights=False):
+    """
+    Jump Point Search is an optimization of A* for uniform-cost grids.
+    It identifies and jumps to key points, significantly reducing nodes explored.
+    """
+
+    def jump(current, direction, goal):
+        """
+        Recursively jump in a direction until hitting a jump point or obstacle.
+
+        Args:
+            current: Current coordinate
+            direction: (dx, dy) direction tuple
+            goal: Goal coordinate
+
+        Returns:
+            Jump point coordinate or None if blocked
+        """
+        next_x = current.x + direction[0]
+        next_y = current.y + direction[1]
+
+        # Check bounds
+        if next_x < 0 or next_x >= maze.rows or next_y < 0 or next_y >= maze.columns:
+            return None
+
+        next_coord = Coordinate(next_x, next_y)
+
+        # Check if blocked by wall
+        if maze.maze[next_x][next_y] == MazeSymbol.wall:
+            return None
+
+        # Check if reached goal
+        if next_coord == goal:
+            return next_coord
+
+        # Check for forced neighbors (this makes it a jump point)
+        if direction[0] != 0 and direction[1] != 0:  # Diagonal movement
+            # Check horizontal and vertical directions
+            if (jump(next_coord, (direction[0], 0), goal) is not None or
+                jump(next_coord, (0, direction[1]), goal) is not None):
+                return next_coord
+        else:  # Horizontal or vertical movement
+            if direction[0] != 0:  # Horizontal
+                # Check for forced neighbors above and below
+                if ((next_x + 1 < maze.rows and maze.maze[next_x + 1][next_y] != MazeSymbol.wall and
+                     next_x + 1 < maze.rows and next_y - direction[1] >= 0 and
+                     maze.maze[next_x + 1][next_y - direction[1]] == MazeSymbol.wall) or
+                    (next_x - 1 >= 0 and maze.maze[next_x - 1][next_y] != MazeSymbol.wall and
+                     next_x - 1 >= 0 and next_y - direction[1] >= 0 and
+                     maze.maze[next_x - 1][next_y - direction[1]] == MazeSymbol.wall)):
+                    return next_coord
+            else:  # Vertical
+                # Check for forced neighbors left and right
+                if ((next_y + 1 < maze.columns and maze.maze[next_x][next_y + 1] != MazeSymbol.wall and
+                     next_x - direction[0] >= 0 and next_y + 1 < maze.columns and
+                     maze.maze[next_x - direction[0]][next_y + 1] == MazeSymbol.wall) or
+                    (next_y - 1 >= 0 and maze.maze[next_x][next_y - 1] != MazeSymbol.wall and
+                     next_x - direction[0] >= 0 and next_y - 1 >= 0 and
+                     maze.maze[next_x - direction[0]][next_y - 1] == MazeSymbol.wall)):
+                    return next_coord
+
+        # Recursively continue jumping
+        return jump(next_coord, direction, goal)
+
+    def get_successors(current):
+        """Get jump point successors for current position."""
+        successors = []
+        # Try all 4 cardinal directions (JPS works best with 4-directional movement)
+        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+
+        for direction in directions:
+            jump_point = jump(current, direction, maze.end_node)
+            if jump_point:
+                successors.append(jump_point)
+
+        return successors
+
+    # Initialize priority queue for JPS
+    frontier = PriorityQueue()
+    heuristic = heuristic_func(maze.end_node)
+    frontier.push(Move(maze.start_node, None, 0.0, heuristic(maze.start_node)))
+
+    # Track visited nodes and their costs
+    visited_node = {maze.start_node: 0.0}
+
+    # List to store all explored paths
+    all_paths = []
+
+    # Main JPS loop
+    while not frontier.empty:
+        loc = frontier.pop()
+        active = loc.current
+        all_paths.append(active)
+
+        # Check if the end node is reached
+        if maze.end_node_line(active):
+            final_path = reconstruct_path(loc)
+            if return_weights: return final_path[1:], all_paths[1:-1], visited_node
+            return final_path[1:], all_paths[1:-1]
+
+        # Get jump point successors
+        successors = get_successors(active)
+
+        for neighbor in successors:
+            # Calculate cost (Manhattan distance between points)
+            new_cost = loc.cost + abs(neighbor.x - active.x) + abs(neighbor.y - active.y)
+
+            # Update cost if a shorter path is found
+            if neighbor not in visited_node or visited_node[neighbor] > new_cost:
+                visited_node[neighbor] = new_cost
+                frontier.push(Move(neighbor, loc, new_cost, heuristic(neighbor)))
+
+    # Return None if no maze solution is found
+    if return_weights: return None, None, visited_node
     return None, None

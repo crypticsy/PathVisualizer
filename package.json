@@ -1,0 +1,22 @@
+{
+  "name": "pathvisualizer",
+  "version": "2.0.0",
+  "description": "Interactive pathfinding algorithm visualizer with Nord Light theme",
+  "scripts": {
+    "build:css": "tailwindcss -i ./api/static/css/input.css -o ./api/static/css/output.css --minify",
+    "watch:css": "tailwindcss -i ./api/static/css/input.css -o ./api/static/css/output.css --watch",
+    "dev": "npm run watch:css"
+  },
+  "keywords": [
+    "pathfinding",
+    "visualization",
+    "algorithms",
+    "a-star",
+    "dijkstra"
+  ],
+  "author": "Crypticsy",
+  "license": "MIT",
+  "devDependencies": {
+    "tailwindcss": "^3.4.0"
+  }
+}

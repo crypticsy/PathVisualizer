@@ -1,147 +1,290 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pathfinding Visualizer - Interactive Algorithm Visualization</title>
+
+    <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="https://path-visualizer-crypticsy.vercel.app/tiles.ico" />
     <link rel="shortcut icon" type="image/x-icon" href="https://path-visualizer-crypticsy.vercel.app/tiles.ico" />
 
-    <meta
-      name="description"
-      content="A python project to visualize search algorithms on a grid. This project is built using the flask framework and the front-end is built using HTML, CSS and JavaScript, as well as uses tailwindcss for styling."
-    />
-    <meta
-      name="keywords"
-      content="Crypticsy, cryptics, cypticsy, path visualize, pathvisualizer, path, Visualizer"
-    />
-    <meta name="robots" content="index,follow" />
-    <meta name="author" content="Crypticsy" />
-    <meta name="language" content="English" />
-    <meta name="revisit-after" content="7 days" />
+    <!-- Meta Tags for SEO and Social -->
+    <meta name="description" content="Interactive visualization of pathfinding algorithms on a customizable grid. Supports A*, Dijkstra, BFS, DFS, Greedy Best-First, Bidirectional A*, and Jump Point Search with drag-and-drop interface."/>
+    <meta name="keywords" content="pathfinding, visualization, algorithms, a-star, dijkstra, bfs, dfs, maze, interactive"/>
+    <meta name="robots" content="index,follow"/>
+    <meta name="author" content="Crypticsy"/>
 
-    <meta property="og:title" content="Path Visualizer" />
-    <meta
-      property="og:image"
-      content="https://path-visualizer-crypticsy.vercel.app/thumbnail.png"
-    />
-    <meta
-      property="og:description"
-      content="A python project to visualize search algorithms on a grid. This project is built using the flask framework and the front-end is built using HTML, CSS and JavaScript, as well as uses tailwindcss for styling."
-    />
-    <meta property="og:url" content="https://path-visualizer-crypticsy.vercel.app/" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="627" />
+    <!-- Open Graph -->
+    <meta property="og:title" content="Pathfinding Visualizer"/>
+    <meta property="og:description" content="Interactive visualization of pathfinding algorithms with drag-and-drop interface and Nord Light theme."/>
+    <meta property="og:image" content="https://path-visualizer-crypticsy.vercel.app/thumbnail.png"/>
+    <meta property="og:url" content="https://path-visualizer-crypticsy.vercel.app/"/>
+    <meta property="og:type" content="website"/>
 
-    <!-- Include this to make the og:image larger -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Path Visualizer" />
-    <meta
-      name="twitter:description"
-      content="A python project to visualize search algorithms on a grid. This project is built using the flask framework and the front-end is built using HTML, CSS and JavaScript, as well as uses tailwindcss for styling."
-    />
-    <meta
-      name="twitter:image"
-      content="https://path-visualizer-crypticsy.vercel.app/thumbnail.png"
-    />
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Pathfinding Visualizer"/>
+    <meta name="twitter:description" content="Interactive visualization of pathfinding algorithms with drag-and-drop interface."/>
+    <meta name="twitter:image" content="https://path-visualizer-crypticsy.vercel.app/thumbnail.png"/>
 
-    <meta name="apple-mobile-web-app-title" content="Snadder" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&family=Roboto+Mono&display=swap" rel="stylesheet">
 
-    <title>Path Visualizer</title>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- TYPE BELOW IS PROBABLY: 'website' or 'article' or look on https://ogp.me/#types -->
-    <meta property="og:type" content="website" />
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+</head>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" async />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin async />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&family=Roboto+Mono&display=swap"
-      rel="stylesheet"
-      async
-    />
+<body class="overflow-hidden">
+    <!-- Main Full-Screen Layout -->
+    <div class="app-container">
+        <!-- Header with All Controls -->
+        <header class="navbar">
+            <div class="navbar-content">
+                <!-- Left: Title -->
+                <div class="navbar-section">
+                    <h1 class="navbar-title">Pathfinding Visualizer</h1>
+                </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/react-icons@4.12.0/fa/index.esm.min.js"></script>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/styles.css') }}"
-    />
-  </head>
+                <!-- Center: Controls -->
+                <div class="navbar-section navbar-controls">
+                    <!-- Grid Size -->
+                    <div class="control-group">
+                        <label class="control-label">Grid</label>
+                        <div class="grid-size-inline">
+                            <input type="number" id="gridRows" class="grid-input" min="10" max="50" value="15">
+                            <span class="grid-x">×</span>
+                            <input type="number" id="gridCols" class="grid-input" min="10" max="50" value="15">
+                            <button id="applyGridSize" class="apply-btn" title="Apply grid size">
+                                <i data-lucide="check"></i>
+                            </button>
+                        </div>
+                    </div>
 
-  <body
-    class="bg-slate-200 text-gray-600 flex justify-center items-center p-5 md:p-16"
-  >
-    <div class="grid grid-cols-2 lg:grid-cols-5 gap-6 space-y-12 ">
-      <div class="flex flex-col col-span-3 px-8">
-        <div class="space-y-6 prevent-select">
-          <h1 class="font-bold text-2xl lg:text-xl text-gray-700">
-            CS7050 : Heuristic Search problem
-          </h1>
+                    <!-- Algorithm -->
+                    <div class="control-group">
+                        <label class="control-label">Algorithm</label>
+                        <select id="algorithmSelect" class="control-select">
+                            <option value="astar">A* Search</option>
+                            <option value="dijkstra">Dijkstra</option>
+                            <option value="bfs">Breadth-First Search</option>
+                            <option value="dfs">Depth-First Search</option>
+                            <option value="greedy">Greedy Best-First</option>
+                            <option value="bidirectional">Bidirectional A*</option>
+                            <option value="jps">Jump Point Search</option>
+                        </select>
+                    </div>
 
-          <hr style="height:2px">
+                    <!-- Speed -->
+                    <div class="control-group">
+                        <label class="control-label">Speed</label>
+                        <div class="speed-control">
+                            <i data-lucide="gauge" class="speed-icon"></i>
+                            <input type="range" id="speedSlider" class="speed-slider" min="10" max="200" value="150" step="10">
+                            <span class="speed-label" id="speedLabel">Medium</span>
+                        </div>
+                    </div>
 
-          <h2 class="font-bold text-lg text-gray-700">Problem Definition :</h2>
-          <p class="text-justify">
-            Given the maze below (5 x 6 nodes) find the shortest path between
-            the starting node and the end node. Their are four permitted moves:
-            <b>Left, Right, Up</b> and <b>Down</b>. On the other hand, the red
-            nodes contain obstacles and no movements in them are possible
-            through them. The boundaries are walls which are blocking the
-            movements.
-          </p>
+                    <!-- Actions -->
+                    <div class="control-group">
+                        <div class="action-buttons">
+                            <button id="runBtn" class="nav-btn nav-btn-primary" data-tooltip="Visualize Path">
+                                <i data-lucide="play"></i>
+                                <span>Visualize</span>
+                            </button>
+                            <button id="generateMazeBtn" class="nav-btn nav-btn-secondary" data-tooltip="Generate Maze">
+                                <i data-lucide="grid-3x3"></i>
+                            </button>
+                            <button id="clearPathBtn" class="nav-btn nav-btn-secondary" data-tooltip="Clear Path">
+                                <i data-lucide="eraser"></i>
+                            </button>
+                            <button id="clearWallsBtn" class="nav-btn nav-btn-secondary" data-tooltip="Clear Walls">
+                                <i data-lucide="trash-2"></i>
+                            </button>
+                            <button id="resetBtn" class="nav-btn nav-btn-danger" data-tooltip="Reset Grid">
+                                <i data-lucide="rotate-ccw"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
-          <div class="gap-y-3 flex flex-col">
-            <h3>See how each algorithm searches:</h3>
-            <div class="grid grid-cols-2 font-bold gap-4">
-              <button type="button" class="rounded-lg py-2" id="drawPathDFS">
-                Depth-First Search
-              </button>
-              <button type="button" class="rounded-lg py-2" id="drawPathBFS">
-                Breadth-First Search
-              </button>
-              <button type="button" class="rounded-lg py-2" id="drawPathAstar">
-                A* Search
-              </button>
-              <button type="button" class="rounded-lg py-2" id="drawPathBiDirectionalHeuristicSearch">
-                BiDirectional Heuristic Search
-              </button>
+                <!-- Right: Stats & Info -->
+                <div class="navbar-section navbar-right">
+                    <!-- Stats -->
+                    <div class="stats-inline">
+                        <div class="stat-inline" data-tooltip="Nodes Visited">
+                            <i data-lucide="eye" class="stat-icon"></i>
+                            <span id="nodesVisited" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-inline" data-tooltip="Path Length">
+                            <i data-lucide="route" class="stat-icon"></i>
+                            <span id="pathLength" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-inline" data-tooltip="Time Taken">
+                            <i data-lucide="clock" class="stat-icon"></i>
+                            <span id="timeTaken" class="stat-value">0ms</span>
+                        </div>
+                    </div>
+
+                    <!-- Info Button -->
+                    <button id="infoBtn" class="icon-btn" title="How to use">
+                        <i data-lucide="info"></i>
+                    </button>
+                </div>
             </div>
-          </div>
+        </header>
 
-          <div class="gap-y-3 flex flex-col">
-            <h4 style="margin-top: 15px">Generate a new random maze:</h4>
-            <form
-              action="{{ url_for('home') }}"
-              method="post"
-              class="grid grid-cols-2 font-bold gap-4"
-            >
-              <button type="submit" class="rounded-lg py-2" name="rand" 
-              value="wall">
-                Randomize Walls
-              </button>
-
-            </form>
-          </div>
-        </div>
-      </div>
-
-      <div class="text-white font-bold col-span-2 flex justify-center items-center">
-        <table id="game" class="flex flex-col gap-2"></table>
-        <script src="{{ url_for('static', filename='js/jsboard.js') }}"></script>
-        <script>
-          var maze_map = {{ maze_map|tojson }}; 
-
-          var dfs_path = {{ dfs_path|tojson }};
-          var bfs_path = {{ bfs_path|tojson }}; 
-          var astar_path = {{ astar_path|tojson }};
-          var bidir_path = {{ bidir_path|tojson }};
-
-          var final_dfs = {{ final_dfs|tojson }}; 
-          var final_bfs = {{ final_bfs|tojson }};
-          var final_astar = {{ final_astar|tojson }};
-          var final_bidir = {{ final_bidir|tojson }};
-        </script>
-        <script src="{{ url_for('static', filename='js/boardcreation.js') }}"></script>
-      </div>
+        <!-- Grid Area (Full Screen) -->
+        <main class="grid-container">
+            <div id="pathGrid" class="path-grid"></div>
+        </main>
     </div>
-  </body>
+
+    <!-- Footer Credit (Fixed at Bottom Center) -->
+    <footer class="footer-credit">
+        <p class="footer-text">
+            <span class="footer-created">Created by </span>
+            <a
+                href="https://www.animeshbasnet.com.np/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="footer-link"
+            >
+                Crypticsy
+                <img
+                    src="https://github.com/crypticsy.png"
+                    alt="Crypticsy"
+                    class="footer-avatar"
+                />
+            </a>
+        </p>
+    </footer>
+
+    <!-- Info Modal -->
+    <div id="infoModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">How to Use</h2>
+                <button id="closeModal" class="icon-btn">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="instruction-list">
+                    <div class="instruction-item-new">
+                        <div class="instruction-number">1</div>
+                        <div>
+                            <h3 class="instruction-title">Adjust Grid Size</h3>
+                            <p class="instruction-text">Set rows and columns (10-50), then click the check button to apply.</p>
+                        </div>
+                    </div>
+                    <div class="instruction-item-new">
+                        <div class="instruction-number">2</div>
+                        <div>
+                            <h3 class="instruction-title">Position Start & End</h3>
+                            <p class="instruction-text">Drag the green start tile and red end tile to set positions.</p>
+                        </div>
+                    </div>
+                    <div class="instruction-item-new">
+                        <div class="instruction-number">3</div>
+                        <div>
+                            <h3 class="instruction-title">Draw Walls</h3>
+                            <p class="instruction-text">Click and drag on empty cells to draw walls. Click walls to erase.</p>
+                        </div>
+                    </div>
+                    <div class="instruction-item-new">
+                        <div class="instruction-number">4</div>
+                        <div>
+                            <h3 class="instruction-title">Select Algorithm</h3>
+                            <p class="instruction-text">Choose from A*, Dijkstra, BFS, DFS, and more.</p>
+                        </div>
+                    </div>
+                    <div class="instruction-item-new">
+                        <div class="instruction-number">5</div>
+                        <div>
+                            <h3 class="instruction-title">Visualize</h3>
+                            <p class="instruction-text">Click "Visualize" to watch the algorithm. Adjust animation speed with the slider.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="keyboard-shortcuts">
+                    <h3 class="shortcuts-title">Keyboard Shortcuts</h3>
+                    <div class="shortcuts-grid">
+                        <div class="shortcut-item">
+                            <kbd>Space</kbd>
+                            <span>Run algorithm</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>C</kbd>
+                            <span>Clear path</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>G</kbd>
+                            <span>Generate maze</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>R</kbd>
+                            <span>Reset grid</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/grid.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/controls.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    <!-- Initialize Lucide Icons -->
+    <script>
+        lucide.createIcons();
+
+        // Update speed label (reversed: low value = slow, high value = fast)
+        const speedSlider = document.getElementById('speedSlider');
+        const speedLabel = document.getElementById('speedLabel');
+
+        function updateSpeedLabel(value) {
+            const speed = parseInt(value);
+            // Reversed logic: higher slider value = faster
+            if (speed >= 170) speedLabel.textContent = 'Very Fast';
+            else if (speed >= 130) speedLabel.textContent = 'Fast';
+            else if (speed >= 80) speedLabel.textContent = 'Medium';
+            else speedLabel.textContent = 'Slow';
+        }
+
+        if (speedSlider && speedLabel) {
+            speedSlider.addEventListener('input', (e) => updateSpeedLabel(e.target.value));
+            updateSpeedLabel(speedSlider.value);
+        }
+
+        // Tooltip functionality
+        const tooltipElements = document.querySelectorAll('[data-tooltip]');
+        const tooltip = document.createElement('div');
+        tooltip.className = 'custom-tooltip';
+        document.body.appendChild(tooltip);
+
+        tooltipElements.forEach(element => {
+            element.addEventListener('mouseenter', (e) => {
+                const text = e.currentTarget.getAttribute('data-tooltip');
+                tooltip.textContent = text;
+                tooltip.classList.add('visible');
+
+                const rect = e.currentTarget.getBoundingClientRect();
+                tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
+                tooltip.style.top = rect.bottom + 8 + 'px';
+            });
+
+            element.addEventListener('mouseleave', () => {
+                tooltip.classList.remove('visible');
+            });
+        });
+    </script>
+</body>
 </html>
