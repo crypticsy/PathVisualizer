@@ -16,6 +16,9 @@
   ],
   "author": "Crypticsy",
   "license": "MIT",
+  "engines": {
+    "node": "24.x"
+  },
   "devDependencies": {
     "tailwindcss": "^3.4.0"
   }
