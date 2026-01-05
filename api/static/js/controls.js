@@ -218,17 +218,17 @@ class VisualizerControls {
             info: 'bg-nord-frost-3'
         };
 
-        notification.className += ` ${colors[type] || colors.info} text-white px-6 py-3 rounded-lg shadow-lg fixed top-4 right-4 z-50`;
+        notification.className += ` ${colors[type] || colors.info} text-white px-6 py-3 rounded-lg shadow-lg fixed top-14 right-4 z-50`;
         notification.textContent = message;
 
         document.body.appendChild(notification);
 
-        // Remove after 3 seconds
+        // Remove after 1.5 seconds
         setTimeout(() => {
             notification.style.opacity = '0';
             setTimeout(() => {
                 document.body.removeChild(notification);
             }, 300);
-        }, 3000);
+        }, 1500);
     }
 }

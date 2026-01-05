@@ -1354,8 +1354,12 @@ kbd {
   right: 1rem;
 }
 
-.top-4 {
-  top: 1rem;
+.top-12 {
+  top: 3rem;
+}
+
+.top-14 {
+  top: 3.5rem;
 }
 
 .z-50 {
